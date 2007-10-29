@@ -1,0 +1,11 @@
+MANIFEST
+ChangeLog
+Makefile.PL
+Build.PL
+README
+lib/[% v.pm_filename %]
+samples/
+t/00-new.t
+t/98-pod.t
+t/99-podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)
