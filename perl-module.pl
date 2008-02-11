@@ -9,10 +9,11 @@ use File::Find;
 use File::Path;
 use File::Basename;
 use File::Copy;
+use File::Spec;
 use FindBin;
 
 my $copy_re = qr/\.(png|gif|jpg|ico|pdf)$/;
-my $src  	= $FindBin::Bin,
+my $src = File::Spec->catdir( $FindBin::Bin, basename( $0, qw(.pl) ) );
 
 my $namespace = shift || usage();
 my $new_dir = lc $namespace;
@@ -81,30 +82,10 @@ my $tt = Template->new( {
 find( { wanted => \&wanted, no_chdir => 1 }, $src );
 
 print <<CVS_DOC;
-Now you should enter into cvs:
-
-cd $new_dir
-cvs import -m "Initial import" Perl/$new_dir mgrimes $new_dir-0-1
-cd ..
-
-cvs checkout CVSROOT/modules
-cd CVSROOT
-echo "$new_dir -d $new_dir Perl/$new_dir" >> modules
-cvs commit -m "Added the $new_dir perl module"
-cd ..
-cvs release -d CVSROOT
-
-mv $new_dir $new_dir.org
-cvs checkout $new_dir
-
-OR INTO SUBVERSION:
-
 cd $new_dir
 svn import svn+ssh://grimes.homeip.net/var/svn/mgrimes/dev/trunk/$new_dir
 cd .. && mv $new_dir $new_dir.org
 svn co svn+ssh://grimes.homeip.net/var/svn/mgrimes/dev/trunk/$new_dir
-
-** All done.
 CVS_DOC
 
 sub wanted { 
