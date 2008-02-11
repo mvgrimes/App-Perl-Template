@@ -63,7 +63,7 @@ __END__
 
 =head1 NAME
 
-[% v.namespace %] - [% abstract %]
+[% v.namespace %] - [% v.abstract %]
 
 =head1 SYNOPSIS
 
@@ -78,9 +78,17 @@ unedited.
 
 Blah blah blah.
 
-=head2 EXPORT
+=head2 METHODS
 
-None by default.
+=over 4
+
+=item method()
+
+    method( args )
+
+The Method does this!
+
+=back
 
 =head1 SEE ALSO
 
@@ -95,15 +103,14 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-[% v.name %], E<lt>[% email %]<gt>
+[% v.name %], E<lt>[% email %]E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by mgrimes
+Copyright (C) [% v.year %] by Mark Grimes
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut
