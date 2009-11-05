@@ -3,18 +3,11 @@ package [% v.namespace %];
 ###########################################################################
 # [% v.namespace %]
 # [% v.name %]
-# $Id: NAMESPACE.pm,v 1.3 2006/11/29 02:40:22 mgrimes Exp $
 #
 # [% v.abstract %]
 # Copyright (c) [% v.year %] [% v.name %] ([% v.email %]).
 # All rights reserved. This program is free software; you can redistribute
 # it and/or modify it under the same terms as Perl itself.
-#
-# Formatted with tabstops at 4
-#
-# Parts of this package were inspired by:
-#   -- Give credit if due --
-# Thanks!
 #
 ###########################################################################
 
