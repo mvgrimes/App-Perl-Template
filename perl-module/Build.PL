@@ -6,15 +6,14 @@ my $build = Module::Build->new(
     create_readme      => 1,
     create_makefile_pl => 'passthrough',
     ## script_files	   =>  [qw( )],
-    requires           => {
+    requires => {
         'perl'       => '5.008',
         'Carp'       => 0,
         'Hash::Util' => 0.05,
+        'Test::Most' => 0,
         ## 'File::Basename'	=> 2.00,
     },
-    recommends => { 
-        'Test::Files' => 0,
-    },
+    recommends => { 'Test::Files' => 0, },
 );
 
 # $build->add_build_element('gif');
