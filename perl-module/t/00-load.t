@@ -1,18 +1,24 @@
 use strict;
 use warnings;
-use Test::Most 'bail';
+use Test::More;
 use File::Find;
 
 BEGIN {
-    my @modules;
+    find( {
+            wanted => sub {
+                return unless m{\.pm$};
 
-    find(
-        sub {
-            push @modules, $_ if /\.pm$/;
+                s{^lib/}{};
+                s{.pm$}{};
+                s{/}{::}g;
+
+                use_ok($_)
+                  or die "Couldn't use_ok $_";
+            },
+            no_chdir => 1,
         },
         'lib'
     );
+    done_testing();
 
-    plan tests => scalar @modules;
-    use_ok $_ for @modules;
 }
