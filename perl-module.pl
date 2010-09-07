@@ -11,9 +11,10 @@ use File::Copy;
 use File::Spec;
 
 $|++;
-
+use Data::Dump;
 my $copy_re = qr/\.(png|gif|jpg|ico|pdf)$/;
-my $src = File::Spec->catpath( $ENV{HOME}, '.msorter' );
+my $src = File::Spec->catdir( $ENV{HOME}, '.pm-template', 'template' );
+print "Template dir is $src\n";
 
 my $namespace = shift || die "usage: $0 namespace\n";
 my $new_dir = lc $namespace;
