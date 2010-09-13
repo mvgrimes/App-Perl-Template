@@ -1,22 +1,12 @@
-#!/usr/bin/env perl
-
 # Ensure pod coverage in your distribution
 use strict;
-
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
+use warnings;
+use Test::More;
 
 my @MODULES = ( 'Test::Pod::Coverage 1.08', );
 
-# Don't run tests during end-user installs
-use Test::More;
-plan( skip_all => 'Author tests not required for installation' )
-  unless ( $ENV{RELEASE_TESTING} );
-
 # Load the testing modules
-foreach my $MODULE (@MODULES) {
+for my $MODULE (@MODULES) {
     eval "use $MODULE";
     if ($@) {
         $ENV{RELEASE_TESTING}
@@ -25,6 +15,5 @@ foreach my $MODULE (@MODULES) {
     }
 }
 
-pod_coverage_ok();
-
+all_pod_coverage_ok();
 1;

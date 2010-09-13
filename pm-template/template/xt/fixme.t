@@ -1,22 +1,12 @@
-#!/usr/bin/env perl
-
 # Check source files for FIXME statements
 use strict;
-
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
+use warnings;
+use Test::More;
 
 my @MODULES = ( 'Test::Fixme 0.04', );
 
-# Don't run tests during end-user installs
-use Test::More;
-plan( skip_all => 'Author tests not required for installation' )
-  unless ( $ENV{RELEASE_TESTING} or $ENV{AUTOMATED_TESTING} );
-
 # Load the testing modules
-foreach my $MODULE (@MODULES) {
+for my $MODULE (@MODULES) {
     eval "use $MODULE";
     if ($@) {
         $ENV{RELEASE_TESTING}
@@ -25,6 +15,7 @@ foreach my $MODULE (@MODULES) {
     }
 }
 
-run_tests();
-
+run_tests( match => qw/\b([T]ODO|[F]IXME|[X]XXX|[B]UG)\b/,
+           where => [ grep { -d } qw(lib root share t) ],
+        );
 1;

@@ -2,13 +2,19 @@ use strict;
 use warnings;
 use Test::More;
 
-plan( skip_all => 'Author test. Set TEST_AUTHOR to a true value to run.' )
-  unless $ENV{TEST_AUTHOR};
+plan( skip_all => 'Only run check-changes test during RELEASE_TESTING' )
+    unless $ENV{RELEASE_TESTING};
 
-eval {
-    require Test::Kwalitee;
-    Test::Kwalitee->import( tests => [qw( -no_symlinks )] );
-    unlink 'Debian_CPANTS.txt' if -e 'Debian_CPANTS.txt';
-};
-plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;
+my @MODULES = ( 'Test::Kwalitee 1.01 qw(-no_symlinks)', );
 
+# Load the testing modules
+for my $MODULE (@MODULES) {
+    eval "use $MODULE";
+    if ($@) {
+        $ENV{RELEASE_TESTING}
+          ? die("Failed to load required release-testing module $MODULE")
+          : plan( skip_all => "$MODULE not available for testing" );
+    }
+}
+
+unlink 'Debian_CPANTS.txt' if -e 'Debian_CPANTS.txt';

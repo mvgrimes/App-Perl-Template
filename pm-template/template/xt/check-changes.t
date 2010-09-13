@@ -1,22 +1,15 @@
-#!/usr/bin/env perl
-
 # Test that Changes has an entry for current version
+use warnings;
 use strict;
+use Test::More;
 
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
+plan( skip_all => 'Only run check-changes test during RELEASE_TESTING' )
+    unless $ENV{RELEASE_TESTING};
 
 my @MODULES = ( 'Test::CheckChanges 0.08', );
 
-# Don't run tests during end-user installs
-use Test::More;
-plan( skip_all => 'Author tests not required for installation' )
-  unless ( $ENV{RELEASE_TESTING} or $ENV{AUTOMATED_TESTING} );
-
 # Load the testing modules
-foreach my $MODULE (@MODULES) {
+for my $MODULE (@MODULES) {
     eval "use $MODULE";
     if ($@) {
         $ENV{RELEASE_TESTING}
@@ -26,5 +19,4 @@ foreach my $MODULE (@MODULES) {
 }
 
 ok_changes();
-
 1;

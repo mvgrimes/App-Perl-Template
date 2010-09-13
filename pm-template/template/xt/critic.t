@@ -1,15 +1,21 @@
-use strict;
 use warnings;
+use strict;
 use Test::More;
 use File::Spec;
 
-plan( skip_all => 'Author test. Set TEST_AUTHOR to a true value to run.' )
-  unless $ENV{TEST_AUTHOR};
+my @MODULES = ( 'Test::Perl::Critic 0.00', );
 
-eval { require Test::Perl::Critic; };
-plan( skip_all => ' Test::Perl::Critic required to criticise code ' ) if $@;
+# Load the testing modules
+for my $MODULE (@MODULES) {
+    eval "use $MODULE";
+    if ($@) {
+        $ENV{RELEASE_TESTING}
+          ? die("Failed to load required release-testing module $MODULE")
+          : plan( skip_all => "$MODULE not available for testing" );
+    }
+}
 
-my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
+my $rcfile = File::Spec->catfile( 'xt', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile, -severity => 3 );
-all_critic_ok();
-
+all_critic_ok( qw(lib) );
+1;
