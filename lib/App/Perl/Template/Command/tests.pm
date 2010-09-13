@@ -16,6 +16,9 @@ sub opt_spec {
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
+    # TODO: ensure initialized
+
+    # TODO: find a better way to ensure we are in the root dir of a project
     $self->usage_error("You must 'start' a module first") unless -d 't';
     $self->usage_error("No arguments allowed") if @$args;
 

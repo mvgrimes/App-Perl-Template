@@ -18,6 +18,8 @@ sub opt_spec {
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
+    # TODO: ensure initialized
+    
     $self->usage_error("no options yet") if keys %$opt;
     $self->usage_error("Module::Name required") unless @$args;
 
@@ -37,17 +39,12 @@ sub run {
     my ( $self, $opt, $arg ) = @_;
     my $result;
 
-    return $result;
-}
+    $self->config->{abstract} = 'the abstract';
+    $self->config->{namespace} = 'the namespace';
 
-sub run {
-    my ( $self, $opt, $arg ) = @_;
-    my $result;
-
-    mkdir 
     return $self->process_templates(
         dest_dir      => $self->config->{dir_name},
-        template_dirs => '.',
+        template_dirs => ['.'],
     );
 
     return 1;
