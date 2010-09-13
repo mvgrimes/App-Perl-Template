@@ -3,13 +3,12 @@ use Module::Build;
 my $build = Module::Build->new(
     module_name        => '[% v.namespace %]',
     license            => 'perl',
-    create_readme      => 1,
+    create_readme      => 0,
     create_makefile_pl => 'passthrough',
     ## script_files	   =>  [qw( )],
     requires => {
         'perl'       => '5.008',
         'Carp'       => 0,
-        'Hash::Util' => 0.05,
         'Test::Most' => 0,
         ## 'File::Basename'	=> 2.00,
     },

@@ -1,52 +1,12 @@
 package [% v.namespace %];
 
-###########################################################################
-# [% v.namespace %]
-# [% v.name %]
-#
-# [% v.abstract %]
-# Copyright (c) [% v.year %] [% v.name %] ([% v.email %]).
-# All rights reserved. This program is free software; you can redistribute
-# it and/or modify it under the same terms as Perl itself.
-#
-###########################################################################
+# ABSTRACT: [% v.abstract %]
 
 use strict;
 use warnings;
 
 use Carp;
-use Hash::Util qw(lock_keys);	# Lock a hash so no new keys can be added
-
 our $VERSION = '0.01';
-
-# #########################################################
-#	Fields contains all of the objects data which can be
-#	set/retreived by an accessor methods
-# #########################################################
-
-my %fields = (		# List of all the fields which will have accessors
-	'name'		=> undef,		# the name 
-);
-
-use base qw(Class::Accessor::Fast);
-__PACKAGE__->mk_accessors( keys %fields );
-
-
-sub new {
-	my $that  = shift;
-	my $class = ref($that) || $that;	# Enables use to call $instance->new()
-	my $self  = {
-		'_private' 	=> 0,	# Private variables
-		%fields,
-	};
-	bless $self, $class;
-
-	# Lock the $self hashref, so we don't accidentally add a key!
-	# TODO: how does this impact inheritance?
-	lock_keys( %$self );
-
-	return $self;
-}
 
 1;
 
@@ -96,11 +56,11 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-[% v.name %], E<lt>[% email %]E<gt>
+[% v.name %], E<lt>[% v.email %]E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) [% v.year %] by Mark Grimes
+Copyright (C) [% v.year %] by [% v.name %]
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,
