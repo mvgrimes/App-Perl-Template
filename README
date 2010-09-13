@@ -1,0 +1,4 @@
+- Enable updating of existing modules
+  - Check md5 checksum before replacing
+  - Replace test files
+  - Update boilerplate?
