@@ -3,6 +3,7 @@ package App::Perl::Template::Command::start;
 use strict;
 use warnings;
 use App::Perl::Template -command;
+use DateTime;
 
 sub usage_desc { "start Module::Name" }
 
@@ -23,9 +24,10 @@ sub validate_args {
     $self->usage_error("no options yet") if keys %$opt;
     $self->usage_error("Module::Name required") unless @$args;
 
+
     my $module_name = shift @$args;
     $self->usage_error("Only one Module::Name may be supplied") if @$args;
-    $self->config->{module_name} = $module_name;
+    $self->config->{namespace} = $self->config->{module_name} = $module_name;
 
     my $dir_name = $self->model_to_path( $module_name);
     $self->usage_error("Module directory ($dir_name) already exists")
@@ -40,7 +42,7 @@ sub run {
     my $result;
 
     $self->config->{abstract} = 'the abstract';
-    $self->config->{namespace} = 'the namespace';
+    $self->config->{year} = DateTime->now->year;
 
     return $self->process_templates(
         dest_dir      => $self->config->{dir_name},

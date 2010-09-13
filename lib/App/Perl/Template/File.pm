@@ -26,6 +26,7 @@ has template => (
 
 method hash {
     ( my $no_empty_lines = $self->contents ) =~ s{^\*$}{};
+    # TODO: strip out all whitespace so tidy never causes a problem
     return md5_hex($no_empty_lines);
 }
 
