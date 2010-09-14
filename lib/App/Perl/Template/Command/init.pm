@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use App::Perl::Template -command;
 
+our $VERSION = '0.03';
+
 use File::Spec;
 use File::Basename;
 use File::Find::Rule;

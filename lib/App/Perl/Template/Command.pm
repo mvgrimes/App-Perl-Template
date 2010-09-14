@@ -2,14 +2,15 @@ package App::Perl::Template::Command;
 
 use strict;
 use warnings;
+use App::Cmd::Setup -command;
+
+our $VERSION = '0.03';
 
 use File::Copy qw(copy);
 use File::HomeDir;
 use File::Find::Rule;
 use Path::Class;
 use App::Perl::Template::File;
-
-use App::Cmd::Setup -command;
 
 sub template_dir {
     my ($self) = @_;

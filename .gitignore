@@ -1,2 +1,7 @@
 *.swp
+*.bak
+MYMETA.yml
 tags
+Build
+_build/
+blib/

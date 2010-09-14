@@ -2,10 +2,11 @@ package App::Perl::Template::File;
 
 use Mouse;
 use Method::Signatures::Simple;
-
 use Path::Class;
 use Template::Tiny;
 use Digest::MD5 qw(md5_hex);
+
+our $VERSION = '0.03';
 
 has src_path => ( is => 'ro', isa => 'Path::Class::File', required => 1 );
 has dst_path => ( is => 'ro', isa => 'Path::Class::File', required => 1 );

@@ -3,6 +3,9 @@ package App::Perl::Template::Command::start;
 use strict;
 use warnings;
 use App::Perl::Template -command;
+
+our $VERSION = '0.03';
+
 use DateTime;
 
 sub usage_desc { "start Module::Name" }
