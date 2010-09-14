@@ -1,8 +1,0 @@
-^_build
-^Build$
-^blib
-~$
-\.bak$
-\.svn/
-^MANIFEST\.SKIP$
-.releaserc
