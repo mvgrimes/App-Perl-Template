@@ -54,16 +54,20 @@ If you have a mailing list set up for your module, mention it here.
 
 If you have a web site set up for your module, mention it here.
 
+=for perl-template md5sum-start author
+
 =head1 AUTHOR
 
 [% author_name %], E<lt>[% email %]E<gt>
 
+=for perl-template md5sum:
+
+=for perl-template md5sum-start license
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) [% year %] by [% author_name %]
+[% license.notice %]
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.2 or,
-at your option, any later version of Perl 5 you may have available.
+=for perl-template md5sum:
 
 =cut

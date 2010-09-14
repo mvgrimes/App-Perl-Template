@@ -2,7 +2,7 @@ use Module::Build;
 
 my $build = Module::Build->new(
     module_name   => '[% namespace %]',
-    license       => 'perl',
+    license       => '[% license.meta_name %]',
     create_readme => 0,
     ## script_files	   =>  [qw( )],
     requires => {
