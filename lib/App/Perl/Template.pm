@@ -6,7 +6,7 @@ use warnings;
 use Config::General;
 use File::Spec;
 use File::HomeDir;
-use App::Cmd::Setup -app;
+use App::Cmd::Setup -app => { plugins => [qw(Prompt)], };
 
 our $VERSION = '0.01';
 

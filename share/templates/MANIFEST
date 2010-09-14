@@ -2,6 +2,6 @@ MANIFEST
 Changes
 Build.PL
 README
-lib/[% v.pm_filename %]
+lib/[% pm_filename %]
 samples/
 META.yml                                 Module meta-data (added by MakeMaker)

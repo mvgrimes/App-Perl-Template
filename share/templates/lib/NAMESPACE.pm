@@ -1,6 +1,6 @@
-package [% v.namespace %];
+package [% namespace %];
 
-# ABSTRACT: [% v.abstract %]
+# ABSTRACT: [% abstract %]
 
 use strict;
 use warnings;
@@ -16,16 +16,16 @@ __END__
 
 =head1 NAME
 
-[% v.namespace %] - [% v.abstract %]
+[% namespace %] - [% abstract %]
 
 =head1 SYNOPSIS
 
-  use [% v.namespace %];
+  use [% namespace %];
   blah blah blah
 
 =head1 DESCRIPTION
 
-Stub documentation for [% v.namespace %]. It looks like the
+Stub documentation for [% namespace %]. It looks like the
 author of the extension was negligent enough to leave the stub
 unedited.
 
@@ -56,11 +56,11 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-[% v.name %], E<lt>[% v.email %]E<gt>
+[% author_name %], E<lt>[% email %]E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) [% v.year %] by [% v.name %]
+Copyright (C) [% year %] by [% author_name %]
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,
