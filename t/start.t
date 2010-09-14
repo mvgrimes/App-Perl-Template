@@ -6,7 +6,7 @@ use App::Perl::Template;
 use Path::Class;
 
 use File::Temp qw(tempdir);
-my $dir = dir( tempdir( CLEANUP => 0 ) );
+my $dir = dir( tempdir( CLEANUP => 1 ) );
 chdir $dir;
 diag $dir;
 

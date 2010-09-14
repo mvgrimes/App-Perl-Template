@@ -25,9 +25,11 @@ has template => (
     default => sub { Template::Tiny->new } );
 
 method hash($contents) {
-    ( my $no_empty_lines = $contents ) =~ s{\n\s*\n}{\n}mg;
-    # TODO: strip out all whitespace so tidy never causes a problem
-    return md5_hex($no_empty_lines);
+    $contents =~ s{\n\s*\n}{\n}mg;             # Strip empty lines
+    $contents =~ s{^#\s*md5sum:(\w+)\s*$}{}m;  # Strip prior file hash
+    ## TODO: strip out all whitespace so tidy never causes a problem
+
+    return md5_hex($contents);
 }
 
 method create($vars) {
@@ -44,13 +46,13 @@ method contents_with_hash {
     # TODO: change comment marker based on file
     
     ( my $contents = $self->contents ) =~ s{
-        perl-template \s+ md5sum-start
+        perl-template \s+ md5sum-start \s+ (\w+)
         (.*?)
         perl-template \s+ md5sum:(\w*)
     }{
-        "perl-template md5sum-start" .
-        $1 .
-        "perl-template md5sum:" . md5_hex( $1 )
+        "perl-template md5sum-start $1" .
+        $2 .
+        "perl-template md5sum:" . md5_hex( $2 )
     }xesg;
 
     return $contents . sprintf "# md5sum:%s\n", $self->hash($contents);
@@ -58,8 +60,7 @@ method contents_with_hash {
 
 method update($vars) {
     my $existing_contents = $self->dst_path->slurp;
-    $existing_contents =~ s/^#\s*md5sum:(\w+)\s*$//m;
-    my $inserted_hash = $1;
+    my ($inserted_hash) = $existing_contents =~ m/^#\s*md5sum:(\w+)\s*$/m;
 
     my $hash = $self->hash( $existing_contents );
 
@@ -72,6 +73,35 @@ method update($vars) {
         $self->create( $vars );
     } else {
         printf "%s has been modified, not updating\n", $self->dst_path;
+
+        # Check the chunks:
+        $existing_contents =~ s{(
+            perl-template \s+ md5sum-start \s+ (\w+)
+            (.*?)
+            perl-template \s+ md5sum:(\w+)
+        )}{
+            $self->chunk( $1, $2, $3, $4 )
+        }xesg;
+
+        # TODO: make sure we aren't getting spanning perl-template blocks
+
+        my $fh = $self->dst_path->openw();
+        print $fh $existing_contents;
+    }
+}
+
+method chunk( $original, $desc, $body, $hash ) {
+    if ( md5_hex($body) eq $hash ) {
+        printf("updating chunk $desc...\n");
+
+        return "perl-template md5sum-start"
+          . "updated asdf\n"
+          . $body
+          . "perl-template md5sum:"
+          . md5_hex("updated asdf\n$body");
+    } else {
+        printf("not updating chunk $desc...\n");
+        return $original;
     }
 }
 
