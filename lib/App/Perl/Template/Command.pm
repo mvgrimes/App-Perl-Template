@@ -12,6 +12,11 @@ use File::Find::Rule;
 use Path::Class;
 use App::Perl::Template::File;
 
+use Module::Pluggable
+  search_path => 'Software::License',
+  require     => 1,
+  sub_name    => 'avail_licenses';
+
 sub template_dir {
     my ($self) = @_;
     return $self->config_dir->subdir(qw(templates));
@@ -103,10 +108,29 @@ sub _copy {
         dst_path => $dst,
     );
 
+    $self->set_license();
+
     if ( !-e $dst ) {
         $file->create( $self->config );
     } else {
         $file->update( $self->config );
+    }
+}
+
+sub set_license {
+    my ($self) = @_;
+
+    if ( !ref( my $lic = $self->config->{license} ) ) {
+        for my $license ( $self->avail_licenses ) {
+            if ( $license->meta_name eq $self->config->{license} ) {
+                $self->config->{license} =
+                  $license->new( { holder => $self->config->{author_name}, } );
+                last;
+            }
+        }
+        die "must specify a valid Software::License in the config file ($lic)"
+          unless ref $self->config->{license}
+              && $self->config->{license}->isa('Software::License');
     }
 }
 

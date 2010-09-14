@@ -13,7 +13,6 @@ use YAML;
 sub opt_spec {
     my ( $class, $app ) = @_;
     return ( [], );
-    ## return ( [ "update|u", "Update previously installed templates" ], );
 }
 
 sub validate_args {
@@ -40,7 +39,7 @@ sub validate_args {
     return 1;
 }
 
-sub run {
+sub execute {
     my ( $self, $opt, $arg ) = @_;
     my $result;
 

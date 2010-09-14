@@ -2,7 +2,7 @@ package App::Perl::Template;
 
 use strict;
 use warnings;
-use App::Cmd::Setup -app => { plugins => [qw(Prompt)], };
+use App::Cmd::Setup -app;
 
 use Config::General;
 use File::Spec;

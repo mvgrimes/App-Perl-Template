@@ -24,8 +24,8 @@ has template => (
     isa     => 'Template::Tiny',
     default => sub { Template::Tiny->new } );
 
-method hash {
-    ( my $no_empty_lines = $self->contents ) =~ s{\n\s*\n}{\n}mg;
+method hash($contents) {
+    ( my $no_empty_lines = $contents ) =~ s{\n\s*\n}{\n}mg;
     # TODO: strip out all whitespace so tidy never causes a problem
     return md5_hex($no_empty_lines);
 }
@@ -33,7 +33,7 @@ method hash {
 method create($vars) {
     $self->vars($vars);
 
-    printf "creating: %s\n", $self->dst_path;
+    printf "processing: %s\n", $self->dst_path;
     $self->dst_path->dir->mkpath;
     my $fh = $self->dst_path->openw() or die "Cannot creat file: $!";
     print $fh $self->contents_with_hash;
@@ -42,15 +42,26 @@ method create($vars) {
 method contents_with_hash {
     # TODO: only insert in acceptable files
     # TODO: change comment marker based on file
-    return $self->contents . sprintf "# md5sum:%s\n", $self->hash;
+    
+    ( my $contents = $self->contents ) =~ s{
+        perl-template \s+ md5sum-start
+        (.*?)
+        perl-template \s+ md5sum:(\w*)
+    }{
+        "perl-template md5sum-start" .
+        $1 .
+        "perl-template md5sum:" . md5_hex( $1 )
+    }xesg;
+
+    return $contents . sprintf "# md5sum:%s\n", $self->hash($contents);
 }
 
 method update($vars) {
     my $existing_contents = $self->dst_path->slurp;
     $existing_contents =~ s/^#\s*md5sum:(\w+)\s*$//m;
     my $inserted_hash = $1;
-    $existing_contents =~ s{\n\s*\n}{\n}mg;
-    my $hash = md5_hex $existing_contents;
+
+    my $hash = $self->hash( $existing_contents );
 
     if(! $inserted_hash ){
         printf "%s exists and no hash marker found, not updating\n", $self->dst_path;

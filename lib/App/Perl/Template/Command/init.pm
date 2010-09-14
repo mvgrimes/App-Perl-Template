@@ -33,7 +33,7 @@ sub validate_args {
     return 1;
 }
 
-sub run {
+sub execute {
     my ( $self, $opt, $arg ) = @_;
     my $result;
 
