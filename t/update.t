@@ -25,25 +25,45 @@ $result = qx{ perl Build.PL 2>&1 };
 ok( -r file('MYMETA.yml'), '... Build.PL created MYMETA.yml' );
 
 # Change the AUTHORs portion of the main module
-$contents = file('lib/MyTest/Module.pm')->slurp or die;
-my $fh = file('lib/MyTest/Module.pm')->openw() or die;
-$contents =~ s{\bAUTHOR\b}{AUTHORS};
-print $fh $contents;
-$fh->close;
+sub change_module {
+    my $contents = file('lib/MyTest/Module.pm')->slurp or die;
+    $contents =~ s{\b(AUTHORS*)\b}{$1S};
+    my $fh = file('lib/MyTest/Module.pm')->openw() or die;
+    print $fh $contents;
+    $fh->close;
+};
 
+# Change the license in the MYMETA.yml file
+do {
+    $contents = file('Build.PL')->slurp or die;
+    $contents =~ s{\blicense\s*=>\s*'perl'}{license => 'artistic_2'};
+    my $fh = file('Build.PL')->openw() or die;
+    print $fh $contents;
+    $fh->close;
+    $result = qx{ perl Build.PL 2>&1 };
+    ok( -r file('MYMETA.yml'), '... Build.PL recreated MYMETA.yml' );
+};
+
+change_module();
 $result = test_app( 'App::Perl::Template' => [qw(update)] );
-is( $result->error, undef, '... update w/o errors' );
-like( $result->stdout, qr{processing: ./Build.PL}, '... update unchanged' );
+is( $result->error, undef, 'update w/o errors' );
+like( $result->stdout, qr{processing: ./Changes},  '... update unchanged' );
 like( $result->stdout, qr{Module.pm has been mod}, '... skip modified' );
 like( $result->stdout, qr{not updating chunk aut}, '... not update chunk' );
 like( $result->stdout, qr{updating chunk auth},    '... update chunk' );
 is( $result->stderr, '',    '... no stderr output' );
 is( $result->error,  undef, '... no errors' );
-
 $contents = file('lib/MyTest/Module.pm')->slurp;
-like( $contents, qr/updated asdf/, '... found updated chunk' );
+like( $contents, qr/Artistic License 2/, '... found updated chunk' );
 
-# like( $contents, qr/# md5sum:\w+/, '... inserted file md5sum' );
-# like( $contents, qr/=for perl-template md5sum:\w+/, '... inserted md5sums' );
+change_module();
+$result = test_app( 'App::Perl::Template' => [qw(update)] );
+is( $result->error, undef, 'update again w/o errors' );
+like( $result->stdout, qr{processing: ./Changes},  '... update unchanged' );
+like( $result->stdout, qr{Module.pm has been mod}, '... skip modified' );
+like( $result->stdout, qr{updating chunk auth}, '... update auth chunk' );
+like( $result->stdout, qr{updating chunk lic},    '... update lic chunk' );
+is( $result->stderr, '',    '... no stderr output' );
+is( $result->error,  undef, '... no errors' );
 
 done_testing;

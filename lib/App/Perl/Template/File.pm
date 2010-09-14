@@ -12,7 +12,7 @@ has src_path => ( is => 'ro', isa => 'Path::Class::File', required => 1 );
 has dst_path => ( is => 'ro', isa => 'Path::Class::File', required => 1 );
 has vars     => ( is => 'rw', isa => 'HashRef' );
 
-has original_contents => (
+has src_content  => (
     is      => 'ro',
     isa     => 'Str',
     default => method { $self->src_path->slurp },
@@ -59,6 +59,8 @@ method contents_with_hash {
 }
 
 method update($vars) {
+    $self->vars($vars);
+
     my $existing_contents = $self->dst_path->slurp;
     my ($inserted_hash) = $existing_contents =~ m/^#\s*md5sum:(\w+)\s*$/m;
 
@@ -91,24 +93,56 @@ method update($vars) {
 }
 
 method chunk( $original, $desc, $body, $hash ) {
-    if ( md5_hex($body) eq $hash ) {
+    my $chunk = $self->available_chunks->{$desc};
+
+    if ( md5_hex($body) eq $hash and $chunk ) {
         printf("updating chunk $desc...\n");
 
-        return "perl-template md5sum-start"
-          . "updated asdf\n"
-          . $body
-          . "perl-template md5sum:"
-          . md5_hex("updated asdf\n$body");
+        my $chunk = $self->process($chunk);
+        $chunk =~ s{
+            perl-template \s+ md5sum-start \s+ (\w+)
+            (.*?)
+            perl-template \s+ md5sum:(\w*)
+        }{
+            "perl-template md5sum-start $1" .
+            $2 .
+            "perl-template md5sum:" . md5_hex( $2 )
+        }xesg;
+
+        return $chunk;
     } else {
         printf("not updating chunk $desc...\n");
         return $original;
     }
 }
 
+method available_chunks {
+    my $content = $self->src_content;
+
+    my @chunks = $content =~ m{(
+            perl-template \s+ md5sum-start \s+ 
+            .*?
+            perl-template \s+ md5sum:\w*
+        )}sxg;
+
+    my %chunks = ( map { 
+            if (m{perl-template \s+ md5sum-start \s+ (\w+)}x) {
+                ( $1 => $_ );
+            } else {
+                ();
+            }
+    } @chunks );
+
+    return \%chunks;
+}
+
 method contents {
     my $output = '';
+    return $self->process( $self->src_content );
+}
 
-    my $input = $self->original_contents;
+method process($input) {
+    my $output = '';
     $self->template->process( \$input, $self->vars, \$output );
     return $output;
 }
