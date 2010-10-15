@@ -1,5 +1,8 @@
+o Command to create new template module-file (not full distribution)
+o Preserve permissions from templates
+o Improve the chunk delimiters
+
 x Enable updating of existing modules
 x Check md5 checksum before replacing
 x Replace test files
-o Update boilerplate?
-o Command to create new tempalte module-file (not full distribution)
+x Update boilerplate?

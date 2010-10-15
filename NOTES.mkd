@@ -1,0 +1,152 @@
+# Why?
+
+## Module::Starter 
+
+By default uses inline templates. To get editable templates need to setup
+a config like this:
+
+	.module-starter/config:
+		builder: Module::Build
+		author:  Mark Grimes
+		email:   mgrimes@cpan.org
+		plugins: Module::Starter::Simple Module::Starter::Plugin::Template Module::Starter::Plugin::DirStore Module::Starter::Plugin::TT2
+		template_dir: /Users/mgrimes/.module-starter/skel
+		template_parms: ''
+
+Took years to stumble upon that config. Still has a number of issues:
+
+- all tests put in `t/`
+- `.gitignore` not created 
+- can't have arbitrary files/directories (ie, `script/app.pl` or `sample/usage.pl`)
+- *can't update once initially created*
+
+Module::Starter::PBP solves some of these, but you still can't put author tests
+in `xt/` or have arbitrary directories/files. You also can't create a new
+module in the distribution after it is initialized, and you are on your own
+for updating boilerplate after it is initialized.
+
+## Module::Setup
+
+Module::Setup is a great improvement over Module::Starter. It is easily to edit
+the template files. It has support for multiple flavors, plugins to initialize
+a git repository, and the ability to  package and share templates. I was in 
+the process of switching to `module-setup`, but I realized I really want the
+ability to:
+
+- generate a new module *after* the distribution has been created
+- update the distribution if I improve the templates
+
+## Dist::Zilla
+
+It really is a monster. If you can get it working for you, it is incredibly
+powerful, but I Spent ton of time creating a `dist.ini` that would allow me to
+work the way I wanted. Here is what I ended up with:
+
+	dist.ini:
+
+	name    = App-EditorTools
+	author  = Mark Grimes <mgrimes@cpan.org>
+	license = Perl_5
+	copyright_holder = Mark Grimes
+
+	; Get files and craete the MANIFEST
+	[AllFiles]
+	[PruneCruft]
+	[PruneFiles]
+	filenames = local
+	filenames = dist.ini
+	[Manifest]
+	; Might use this (and a MANIFEST.SKIP file) this instead of [PruneCruft]
+	; [ManifestSkip]
+
+	; Create the Build.PL
+	[ExecDir]
+	dir = scripts
+	[Prereq / TestRquires]
+	Test::Differences = 0
+	Text::Diff        = 0
+	Test::More        = 0.87
+	File::Find        = 0
+	[Prereq]
+	perl              = 5.008
+	PPIx::EditorTools = 0
+	App::Cmd          = 0.301
+	File::Path        = 0
+	File::Basename    = 0
+	File::ShareDir    = 0
+	IPC::Cmd          = 0
+	File::HomeDir     = 0.80
+	File::Slurp       = 0
+	parent            = 0
+	[ShareDir]
+	[ModuleBuild]
+	; Could replace with this if we need more control
+	; [ModuleBuild::Custom]
+
+	; Create meta files
+	[Bugtracker] 	; add rt queue for META.json
+	[Homepage]		; add search.cpan.org link to META.json
+	[Repository]	; add git repos to META.json
+	[MetaYAML]		; would like to JSON, but Kwalitee doesn't like it
+	[License]
+	[Readme]
+	; [NextRelease] 	; writes version # to Changes / would be nice to pull info from git log
+	[Git::Changes]				; Adds entry to Changes
+	version_regexp = ^v(.+)$	; TODO:
+
+	; Updated .pm files
+	[PkgVersion::Simple]	; add version to all .pm
+	; [PodVersion]			; add version to pod 
+	[PodWeaver]				; add LIC and AUTH, etc to pod
+
+	; Add the Stock tests:
+	[PodTests]		 ; Pod::Coverage::TrustPod barfs
+	[KwaliteeTests]	 ; checks everything including local::lib in ./local
+	; 					 ; need method to ignore particular dirs
+	; 					 ; Also wants META.yml not .json
+	[CriticTests]		 ; strictures is broken by dzil PackageVerson
+	; [PortabilityTests] ; won't install
+	; [PodSpellintTests] ; need to be able to pass aspell -l to set_spell_cmd
+	; Need test::prereqs
+
+	; Checks before release
+	[CheckChangeLog]	; is this version in the changes file
+	[TestRelease]
+	[CheckExtraTests]	; run the xt tests
+	; [ModuleBuild::Test]	; is this necessary?
+	[Git::Check]		; 
+
+	; Release process
+	[BumpVersionFromGit]
+	first_version = 0.01
+	version_regexp = ^v(.+)$
+	; [ConfirmRelease]
+	[FakeRelease]
+	; [UploadToCPAN]
+
+	; Post release
+	[Git::Commit]	; commits changes file after release
+	[Git::Tag]
+	tag_format = v%v
+	; [Git::Push]
+	[ArchiveRelease]		; needs patch to work with ~
+	directory = /Users/mgrimes/src/modules/RELEASED
+
+	; Things we don't want:
+	; [ExtraTests]  ; writes ./xt test to ./t
+
+`<kidding>`Ok. So now I need a templating tool to recreate the `dist.ini` for
+each project!`</kidding>` What I really need is my own bundle. Had to dig
+around to figure out how to do that. I heard it is getting easier, but should I
+really have to have a release on CPAN just to template a new module? And before
+I knew it, I was investing in writing plugins to get my preferred module
+versioning and automating the update of Changes.
+
+All that, I there are still problems:
+
+- What if I want to run author tests during development? Why should `dzil` be
+  involved? What if I want to run just one author test?
+- Need to run build before xtests
+- Can't easily pass options to many plugins (Test::Kwalitee)
+- Inserts code before strictures breaking Perl::Critic
+- Pod::Coverage::TrustPod barfs w/ unmatched (

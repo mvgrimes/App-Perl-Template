@@ -5,10 +5,13 @@ use App::Cmd::Tester;
 use App::Perl::Template;
 use Path::Class;
 
+$ENV{APP_PERL_TEMPLATE_TESTING} = 1;
+
 use File::Temp qw(tempdir);
 my $dir = dir( tempdir( CLEANUP => 1 ) );
 chdir $dir;
 diag $dir;
+
 
 my ( $result, $contents );
 
@@ -16,6 +19,7 @@ $result =
   test_app( 'App::Perl::Template' =>
       [ qw(start MyTest::Module --abstract), 'A test module for me' ] );
 is( $result->error, undef, 'good start' );
+is( $result->stderr, '', '... with no output on stderr' );
 
 # TODO: test when we run update outside of a distribution
 
@@ -31,7 +35,7 @@ sub change_module {
     my $fh = file('lib/MyTest/Module.pm')->openw() or die;
     print $fh $contents;
     $fh->close;
-};
+}
 
 # Change the license in the MYMETA.yml file
 do {
@@ -47,10 +51,10 @@ do {
 change_module();
 $result = test_app( 'App::Perl::Template' => [qw(update)] );
 is( $result->error, undef, 'update w/o errors' );
-like( $result->stdout, qr{processing: ./Changes},  '... update unchanged' );
+like( $result->stdout, qr{creating:  ./Changes},  '... update unchanged' );
 like( $result->stdout, qr{Module.pm has been mod}, '... skip modified' );
-like( $result->stdout, qr{not updating chunk aut}, '... not update chunk' );
-like( $result->stdout, qr{updating chunk auth},    '... update chunk' );
+like( $result->stdout, qr{not updating chunk =head1 A}, '... not update chunk' );
+like( $result->stdout, qr{updating chunk =head1 C}, '... update lic chunk' );
 is( $result->stderr, '',    '... no stderr output' );
 is( $result->error,  undef, '... no errors' );
 $contents = file('lib/MyTest/Module.pm')->slurp;
@@ -59,10 +63,10 @@ like( $contents, qr/Artistic License 2/, '... found updated chunk' );
 change_module();
 $result = test_app( 'App::Perl::Template' => [qw(update)] );
 is( $result->error, undef, 'update again w/o errors' );
-like( $result->stdout, qr{processing: ./Changes},  '... update unchanged' );
+like( $result->stdout, qr{creating:  ./Changes},  '... update unchanged' );
 like( $result->stdout, qr{Module.pm has been mod}, '... skip modified' );
-like( $result->stdout, qr{updating chunk auth}, '... update auth chunk' );
-like( $result->stdout, qr{updating chunk lic},    '... update lic chunk' );
+like( $result->stdout, qr{updating chunk =head1 A}, '... update auth chunk' );
+like( $result->stdout, qr{updating chunk =head1 C}, '... update lic chunk' );
 is( $result->stderr, '',    '... no stderr output' );
 is( $result->error,  undef, '... no errors' );
 

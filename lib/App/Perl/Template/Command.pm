@@ -6,6 +6,7 @@ use App::Cmd::Setup -command;
 
 our $VERSION = '0.03';
 
+use FindBin;
 use File::Copy qw(copy);
 use File::HomeDir;
 use File::Find::Rule;
@@ -24,6 +25,8 @@ sub template_dir {
 
 sub config_dir {
     my ($self) = @_;
+    return dir( $FindBin::Bin, '..', 'share' )
+      if $ENV{APP_PERL_TEMPLATE_TESTING};
     return dir( File::HomeDir->my_home, qw(.perl-templates) );
 }
 

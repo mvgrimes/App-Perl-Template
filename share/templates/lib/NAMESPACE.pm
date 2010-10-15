@@ -18,6 +18,10 @@ __END__
 
 [% namespace %] - [% abstract %]
 
+=head1 VERSION
+
+    version = 0.01
+
 =head1 SYNOPSIS
 
   use [% namespace %];
@@ -54,20 +58,16 @@ If you have a mailing list set up for your module, mention it here.
 
 If you have a web site set up for your module, mention it here.
 
-=for perl-template md5sum-start author
-
 =head1 AUTHOR
 
 [% author_name %], E<lt>[% email %]E<gt>
 
-=for perl-template md5sum:
-
-=for perl-template md5sum-start license
+=for perl-template id="=head1 AUTHOR" md5sum=
 
 =head1 COPYRIGHT AND LICENSE
 
 [% license.notice %]
 
-=for perl-template md5sum:
+=for perl-template id="=head1 COPYRIGHT" md5sum=
 
 =cut
