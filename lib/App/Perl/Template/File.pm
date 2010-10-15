@@ -7,7 +7,7 @@ use Path::Class;
 use Template::Tiny;
 use Digest::MD5 qw(md5_hex);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 has src_path => ( is => 'ro', isa => 'Path::Class::File', required => 1 );
 has dst_path => ( is => 'ro', isa => 'Path::Class::File', required => 1 );
@@ -140,13 +140,9 @@ method update($vars) {
     my ($inserted_hash) = $existing_contents =~ m/\bperl-template\s+md5sum=(\w*)/m;
     my $hash = $self->hash($existing_contents);
 
-    if( not $inserted_hash ){
-        printf "%s exists and no hash marker found, not updating\n", $self->dst_path;
-        return;
-    }
-
-    if( $inserted_hash eq $hash ){   # This hasn't been modified, update
-        # printf "%s exists and has not been updated, recreating\n", $self->dst_path;
+    # If we have a hash and the file hasn't been modified, update
+    if( $inserted_hash and $inserted_hash eq $hash ){
+        printf "%s exists and has not been updated, recreating\n", $self->dst_path;
         $self->create( $vars );
         return;
     }
@@ -172,10 +168,6 @@ method update($vars) {
 }
 
 method _chunk( %h ) {
-    print "hash = $h{hash}\n";
-    print "new md5 = " . md5_hex($h{body}) . "\n";
-    print "body = $h{body}\n";
-
     if ( $h{hash} and $h{hash} ne md5_hex($h{body}) ) {
         printf("not updating chunk $h{ident}...\n");
         return;

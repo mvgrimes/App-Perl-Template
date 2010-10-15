@@ -8,7 +8,7 @@ use Config::General;
 use File::Spec;
 use File::HomeDir;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 1;
 

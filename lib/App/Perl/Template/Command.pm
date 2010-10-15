@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use App::Cmd::Setup -command;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use FindBin;
 use File::Copy qw(copy);
